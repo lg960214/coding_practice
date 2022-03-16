@@ -7,9 +7,6 @@ data = []
 for _ in range(k):
     data.append(int(input()))
 
-# k, n = 4, 11
-# data = [802, 743, 457, 539]
-
 left = 1
 right = max(data)
 
