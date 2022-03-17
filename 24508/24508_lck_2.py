@@ -11,7 +11,7 @@ if not sum(data) % k == 0:  # 터지지 않고 남는 것이 있을 때
     print("NO")
 else:
     quotient = sum(data) // k
-    remainder_sum = sum(data[temp:])
+    remainder_sum = sum(data[quotient:])
     if remainder_sum > t:
         print("NO")
     else:
