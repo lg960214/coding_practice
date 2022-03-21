@@ -1,6 +1,5 @@
 from collections import deque
 import sys
-sys.stdin = open('testcase.txt', 'r')
 input = sys.stdin.readline
 
 N, M, R = map(int, input().split())
