@@ -8,12 +8,10 @@ if f > w // 2:
     f = w - f
 
 width = x2 - x1
-double = 0
 
 if x1 < f:
-    double = min(f, x2) - x1
+    width  += min(f, x2) - x1
 
-width += double
 painted = width * (y2 - y1) * (c + 1)
 
 print(w * h - painted)
