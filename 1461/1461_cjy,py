@@ -1,0 +1,17 @@
+import sys
+input = sys.stdin.readline
+
+N, M = map(int, input().split())
+locations = sorted(list(map(int, input().split())))
+left = [abs(x) for x in locations if x < 0]
+right = [x for x in locations if x > 0][::-1]
+
+def get_count(lst):
+    ret = 0
+    for i, ele in enumerate(lst):
+        if i % M == 0:
+            ret += ele * 2
+    return ret
+
+result = get_count(left) + get_count(right)
+print(result - abs(max(locations, key=abs)))
