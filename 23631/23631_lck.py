@@ -10,17 +10,13 @@ for _ in range(t):
     times = (-1 + sqrt(1 + 8 * (n - 1) / k)) / 2
     times_floor = floor(times)
     remainder = (n - 1) - k * (times_floor + 1) * times_floor // 2
-    temp = (times_floor + 1) // 2 * k
+    last_location = (times_floor + 1) // 2 * k
 
     if not times_floor % 2:
         # even
-        temp = -temp
-        last_distance = remainder + temp
+        last_distance = remainder - last_location
+        print(last_distance, "R")
     else:
         # odd
-        last_distance = temp - remainder
-
-    if times_floor % 2:
+        last_distance = last_location - remainder
         print(last_distance, "L")
-    else:
-        print(last_distance, "R")
