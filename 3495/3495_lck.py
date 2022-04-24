@@ -11,7 +11,6 @@ check = 0
 for i in range(h):
     for j in range(w):
         if data[i][j] == "/" or data[i][j] == "\\":
-            slash = j
             answer += 0.5
             check += 1
         elif check % 2:
