@@ -3,6 +3,19 @@ import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
+def dfs(x):
+    if not graph[x]:
+        dp[x] = time[x - 1]
+        return dp[x]
+    if not dp[x] == -1:
+        return dp[x]
+
+    for node in graph[x]:
+        dp[x] = max(dfs(node), dp[x])
+    dp[x] += time[x - 1]
+
+    return dp[x]
+
 t = int(input().strip())
 for _ in range(t):
     n, k = map(int, input().strip().split())
@@ -14,19 +27,6 @@ for _ in range(t):
     w = int(input().strip())
 
     dp = [-1] * (n + 1)
-
-    def dfs(x):
-        if not graph[x]:
-            dp[x] = time[x - 1]
-            return dp[x]
-        if not dp[x] == -1:
-            return dp[x]
-
-        for node in graph[x]:
-            dp[x] = max(dfs(node), dp[x])
-        dp[x] += time[x - 1]
-
-        return dp[x]
 
     dfs(w)
     print(dp[w])
