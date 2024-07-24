@@ -1,32 +1,36 @@
-class Sol:
-    S = 101
-    dx = [0, 1, 0, -1]
-    dy = [1, 0, -1, 0]
-    length = 0
+T = int(input())
+a = [[0]*103 for _ in range(103)]
+minnx = 102
+minny = 102
+maxxx = -1
+maxxy = -1
+for _ in range(T):
+    c,b = map(int,input().split())
+    for i in range(c+1,c+11):
+        for j in range(b+1,b+11):
+            a[i][j] = 1
+    # minnx = min(minnx,c+1)
+    # minny = min(minny,b+1)
+    # maxxx = max(maxxx,c+11)
+    # maxxy = max(maxxy,b+11)
+summ = 0
 
-    def __init__(self):
-        self.arr = [[0]*self.S for _ in range(self.S)]
+for i in range(0, 103):
 
-        N = int(input())
+    for j in range(0,103):
+        if(a[i][j] == 0): continue
 
-        for _ in range(N):
-            temp = list(map(int, input().split()))
+        if a[i][j-1] == 0:
+            summ+=1
+            #a[i][j] = 3
+        if a[i][j+1] == 0:
+            summ+=1
+            #a[i][j] = 3
+        if a[i-1][j] == 0:
+            summ+=1
+            #a[i][j] = 3
+        if a[i+1][j] == 0:
+            summ+=1
+            #a[i][j] = 3
 
-            for i in range(10):
-                for j in range(10):
-                    self.arr[temp[0]+i][temp[1]+j] = 1
-
-        for i in range(0, self.S):
-            for j in range(0, self.S):
-                for c in range(4):
-                    x_ = i + self.dx[c]
-                    y_ = j + self.dy[c]
-                    if not ((0 <= x_ < self.S) and (0 <= y_ < self.S)): continue
-                    if (self.arr[i][j] != self.arr[x_][y_]):
-                        self.length += 1
-
-        self.length /= 2
-
-        print(int(self.length))
-
-user = Sol()
+print(summ)
