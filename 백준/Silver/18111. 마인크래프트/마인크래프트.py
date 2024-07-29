@@ -1,17 +1,15 @@
 land = []
 
 N, M, B = map(int, input().split())
-min_height = 0
+min_height = 1e9
 max_height = 0
 for _ in range(N):
     temp = list(map(int, input().split()))
-    max_height += sum(temp)
     land.append(temp)
+    min_height = min(min(temp), min_height)
+    max_height = max(max(temp), max_height)
 
-max_height += B
-max_height //= N*M
-
-def mine_time(land, height, inven):
+def mine_time(land, height):
     time = 0
     for i in range(N):
         for j in range(M):
@@ -20,11 +18,22 @@ def mine_time(land, height, inven):
             elif land[i][j] < height:
                 time += height - land[i][j]
     return time
-min_time = 1e9
-for i in range(min_height, max_height+1):
-    i_time = mine_time(land, i, B)
-    if i_time <= min_time:
-        min_time = i_time
-        min_height_result = i
+
+# 견적 짜는거 추가
+blocks = 0
+for s in range(N):
+    blocks += sum(land[s])
+blocks += B
+
+min_time = blocks*2
+min_height_result = 0
+
+for h in range(max_height+1):
+    if blocks < N*M*h:
+        continue
+    h_time = mine_time(land, h)
+    if h_time <= min_time:
+        min_time = h_time
+        min_height_result = h
 
 print(min_time, min_height_result)
