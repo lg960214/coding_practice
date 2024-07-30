@@ -1,44 +1,36 @@
 import sys
-sys.setrecursionlimit(10000)
-input = sys.stdin.readline
+sys.setrecursionlimit(10**4)
 
-def dfs(cur_x, cur_y):
-    global visit
-    visit[cur_x][cur_y] = True
+# 상, 하, 좌, 우
+di_lst = [1, -1, 0, 0]
+dj_lst = [0, 0, -1, 1]
 
-    for i in range(4):
-        x_ = cur_x + dx[i]
-        y_ = cur_y + dy[i]
-        if not ((0 <= x_ < N) and (0 <= y_ < M)): continue
-        if visit[x_][y_] == True: continue
-        if (arr[x_][y_] == 0): continue
-        dfs(x_, y_)
+def dfs(i, j):
+    land[i][j] = 0
 
-
-dx = [-1, 0, 1, 0]
-dy = [0, 1, 0, -1]
+    for di, dj in zip(di_lst, dj_lst):
+        x = i + di
+        y = j + dj
+        if not (0 <= x < N and 0 <= y < M):
+            continue
+        if land[x][y] == 1:
+            dfs(x, y)
+    else:
+        return 1
 
 T = int(input())
-ans_lst = []
 
-for t in range(1, T+1):
+for t in range(T):
     M, N, K = map(int, input().split())
-
-    arr = [[0]*M for _ in range(N)]
-    visit = [[False]*M for _ in range(N)]
+    land = [[0 for _ in range(M)] for _ in range(N)]
 
     for _ in range(K):
-        ty, tx = map(int, input().split())
-        arr[tx][ty] = 1
-
-    cnt = 0
+        X, Y = map(int, input().split())
+        land[Y][X] = 1
+    summ = 0
     for i in range(N):
         for j in range(M):
-            if (arr[i][j] == 1 and visit[i][j] == False):
-                dfs(i, j)
-                cnt += 1
-
-    ans_lst.append(cnt)
-
-for i in ans_lst:
-    print(i)
+            if land[i][j] != 1:
+                continue
+            summ += dfs(i, j)
+    print(summ)
