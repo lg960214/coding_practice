@@ -1,7 +1,5 @@
-import sys
-
-input = sys.stdin.readline
-
+import os, io, sys
+input = io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
 N, M = map(int, input().split())
 
 c_arr = [[0]*(N+1)]
