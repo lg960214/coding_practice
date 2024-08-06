@@ -1,41 +1,121 @@
 from collections import deque
-from copy import deepcopy
-dir = ((0,-1), (-1,0), (0,1)) #좌, 상, 우 순으로 탐색(먼저 발견한게 가장 왼쪽이 됨)
 
-def bfs(r,c): #round r이면 r = R-r이 됨. 즉 라운드 r이면 arr의 0~R-r행만 사용
-    global kill
-    dq = deque()
-    used = [[0]*C for _ in range(r)]
-    used[r-1][c] = 1
-    dq.append((r-1,c))
-    while dq:
-        cr, cc = dq.popleft()
-        if arr2[cr][cc] == 1: #1만나면 kill에 좌표 추가함(가장 가까우면서 가장 왼쪽이 됨)
-            if used[cr][cc] <= D: #사거리보다 작으면 추가, 아니면 이번라운드에 킬 못함
-                kill.add((cr,cc))
+class Node:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Sol:
+    dx = [0, -1, 0]
+    dy = [-1, 0, 1]
+    kill = 0
+    ans = -1
+
+    def __init__(self):
+        self.N, self.M, self.D = map(int, input().split())
+
+        self.arr = [list(map(int, input().split())) for _ in range(self.N)]
+
+        self.putHunter()
+
+        print(self.ans)
+
+    def putHunter(self):
+        self.hunters = []
+        self.visit = [False]*self.M
+
+        self.DFS(0, 0)
+
+    def DFS(self, level, now):
+        if (level == 3):
+            self.kill = 0
+            self.GAME()
             return
-        for dr, dc in dir:
-            nr, nc = cr+dr, cc+dc
-            if 0<=nr<r and 0<=nc<C and used[nr][nc] == 0:
-                used[nr][nc] = used[cr][cc] + 1
-                dq.append((nr,nc))
 
-T = 1
-for tc in range(1, T+1):
-    R, C, D = map(int,input().split())
-    arr = [list(map(int,input().split())) for _ in range(R)]
-    mx = 0
-    for a1 in range(0, C-2): #archery
-        for a2 in range(a1+1, C-1):
-            for a3 in range(a2+1, C):
-                arr2 = [deepcopy(lst) for lst in arr] #arr 복사해서 이번 궁수 스쿼드에 사용
-                kills = 0 #이번 궁수 스쿼드의 총 킬수
-                for r in range(R): #round r = 0이 처음 R-1이 마지막
-                    kill = set() #이번 라운드에 bfs를 돌며 죽인 적의 좌표 (중복으로 죽여도 set이라 겹치지 않음)
-                    for archery in (a1,a2,a3):
-                        bfs(R-r, archery) #bfs를 돌며 kill에 좌표를 추가함
-                    for r1, c1 in kill: #kill 좌표 빼서 arr2에 죽인 적을 0으로 바꿈
-                        arr2[r1][c1] = 0
-                    kills += len(kill) #이번라운드 킬수 추가
-                mx = max(mx, kills)
-    print(mx)
+        for i in range(now, self.M):
+            if self.visit[i] == True: continue
+            self.visit[i] = True
+            self.hunters.append(i)
+            self.DFS(level+1, i+1)
+            self.hunters.pop()
+            self.visit[i] = False
+
+    def GAME(self):
+        self.board = []
+        for i in range(self.N):
+            self.board.append(self.arr[i][:])
+
+        flag = 1
+
+        while flag:
+            for i in range(3):
+                self.BFS(self.hunters[i])
+
+            self.M_BFS()
+
+            flag = self.countMonster()
+
+        self.ans = max(self.kill, self.ans)
+
+    def BFS(self, start):
+
+        q = deque()
+
+        q.append(Node(self.N, start))
+
+        visit = [[False]*self.M for _ in range(self.N)]
+
+        step = 0
+        curSize = 0
+
+        while q:
+            if (step == self.D): break
+
+            curSize = q.__len__()
+
+            for c in range(curSize):
+                target = q.popleft()
+                for i in range(3):
+                    nx = target.x + self.dx[i]
+                    ny = target.y + self.dy[i]
+
+                    if not ((0 <= nx < self.N) and (0 <= ny < self.M)): continue
+                    if self.board[nx][ny] == 1 or self.board[nx][ny] == -1:
+                        self.board[nx][ny] = -1
+                        return
+
+                    if (visit[nx][ny] == True): continue
+
+                    visit[nx][ny] = True
+                    q.append(Node(nx, ny))
+
+            step += 1
+
+        return
+
+    def M_BFS(self):
+
+        for i in range(self.N):
+            for j in range(self.M):
+                if (self.board[i][j] == -1):
+                    self.kill += 1
+                    self.board[i][j] = 0
+
+        for i in range(self.N-1, 0, -1):
+            for j in range(self.M):
+                self.board[i][j] = self.board[i-1][j]
+
+        for j in range(self.M):
+            self.board[0][j] = 0
+
+    def countMonster(self):
+        cnt = 0
+
+        for i in range(self.N):
+            for j in range(self.M):
+                if self.board[i][j] == 1:
+                    cnt += 1
+
+        return cnt
+
+user = Sol()
