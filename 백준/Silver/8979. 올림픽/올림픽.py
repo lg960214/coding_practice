@@ -1,28 +1,26 @@
 N, K = map(int, input().split())
 
+target_lst = ''
 arr = []
 
-for i in range(N):
-    num, g, s, c = map(int, input().split())
-    temp_lst = [g,s,c,num]
+for _ in range(N):
+    temp_lst = list(map(int, input().split()))
+    if temp_lst[0] == K:
+        target_lst = temp_lst
     arr.append(temp_lst)
 
-arr.sort(reverse=True)
-
-ranking = [i for i in range(1, N+1)]
-
-
-for i in range(N-1):
-    prev = arr[i][:3]
-    for j in range(1, N):
-        next = arr[j][:3]
-
-        if (prev == next):
-            ranking[j] = ranking[i]
-        else:
-            break
+rank = 1
 
 for i in range(N):
-    if (arr[i][3] == K):
-        print(ranking[i])
-        break
+    comp_lst = arr[i]
+    if comp_lst[1] > target_lst[1]:
+        rank += 1
+    elif comp_lst[1] == target_lst[1]:
+        if comp_lst[2] > target_lst[2]:
+            rank += 1
+        elif comp_lst[2] == target_lst[2]:
+            if comp_lst[3] > target_lst[3]:
+                rank += 1
+
+print(rank)
+
