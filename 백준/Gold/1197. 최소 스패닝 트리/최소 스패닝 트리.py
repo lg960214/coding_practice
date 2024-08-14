@@ -20,12 +20,18 @@ def Union(a, b):
 def kruskal():
     sm_w = 0
 
+    tree_cnt = 0
+
     while heap:
         w, v1, v2 = hq.heappop(heap)
 
         if (Find(v1) == Find(v2)): continue
         sm_w += w
         Union(v1, v2)
+
+        tree_cnt += 1
+
+        if (tree_cnt == N-1): break
 
     return sm_w
 
