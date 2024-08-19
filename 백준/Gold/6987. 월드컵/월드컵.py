@@ -15,14 +15,14 @@ def rec(step):
         team = case_lst[step][0]
         enemy = case_lst[step][1]
         if i == 0: # 앞이 이김
-            if canBe[team][0] > arr[team][0] or canBe[enemy][2] > arr[enemy][2]: continue
+            if canBe[team][0] >= arr[team][0] or canBe[enemy][2] >= arr[enemy][2]: continue
             canBe[team][0] += 1
             canBe[enemy][2] += 1
             rec(step + 1)
             canBe[team][0] -= 1
             canBe[enemy][2] -= 1
         elif i == 1: # 무승부
-            if canBe[team][1] > arr[team][1] or canBe[enemy][1] > arr[enemy][1]: continue
+            if canBe[team][1] >= arr[team][1] or canBe[enemy][1] >= arr[enemy][1]: continue
             canBe[team][1] += 1
             canBe[enemy][1] += 1
             rec(step + 1)
@@ -30,7 +30,7 @@ def rec(step):
             canBe[enemy][1] -= 1
 
         else: # 뒤가 이김
-            if canBe[team][2] > arr[team][2] or canBe[enemy][0] > arr[enemy][0]: continue
+            if canBe[team][2] >= arr[team][2] or canBe[enemy][0] >= arr[enemy][0]: continue
             canBe[team][2] += 1
             canBe[enemy][0] += 1
             rec(step + 1)
