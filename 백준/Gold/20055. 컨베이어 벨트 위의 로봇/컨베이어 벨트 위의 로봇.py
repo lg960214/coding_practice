@@ -1,92 +1,106 @@
-# @ 문제 분석
-#
-# [1] 문제 조건
-# - 길이가 N / 위도 N 아래도 N
-#   - 시간복잡도를 고려했을 때, array 2개로 짜도 된다
-#   - robot array 2개, 내구도 array 2개
-#
-# - 종료 조건
-#   - 4번 단계에서 종료 가능
-#   - step을 세야 한다
-#
-# [2] 시간복잡도
-#  1. Ai 번 이동 = 100*4 = 4000
-#  2. 로봇 탐색 = 100
-#  3. pass
-#  4. 내구도 탐색 = 100*2
-#  5. 최대 반복 : 2000
-#  --> 5000 x 1000 = 10,000,000
-#  --> 시간복잡도에 걸릴 일은 없다
-#
-# @ 검증
-# --> "가장 먼저 올라간 로봇부터" 조건 빠트려서, 다시 구현
-# --> down arr에 해당하는 로봇은 필요없으므로, 제거
-# --> 로봇 옮겼으면, 자리를 비워주는 것 구현
+# @ 연결리스트를 이용한 풀이
+import time
 
+class Node:
+    def __init__(self, durable):
+        self.durable = durable # 내구도 정보
+        self.next = None # next node pointer
+        self.prev = None # previous node pointer
+        self.robot = False # robot 여부
+
+    def __str__(self): # 디버깅용 str 선언
+        if self.prev != None and self.next != None:
+            return f'{self.durable} {self.robot}'
+        if self.prev == None and self.next != None:
+            return f'{self.durable} {self.robot}'
+        if self.prev != None and self.next == None:
+            return f'{self.durable} {self.robot}'
+        else:
+            return f'{self.durable} {self.robot}'
+
+    def __repr__(self):
+        return f'{self.durable} {self.next} {self.prev} {self.robot}'
 
 N, K = map(int, input().split())
 
-tmp_lst = list(map(int, input().split()))
+A = list(map(int, input().split())) # 내구도 정보
 
-up_arr = tmp_lst[:N]
-down_arr = tmp_lst[N:][::-1]
 
-up_robot = [False]*N
+first_node = None
+last_node = None
+
+for i in range(2*N):
+    if i == 0:
+        first_node = Node(A[0])
+        cur_node = first_node
+    else:
+        cur_node = Node(A[i])
+        past_node.next = cur_node
+        cur_node.prev = past_node
+        if i == N-1:
+            last_node = cur_node
+    past_node = cur_node
+else:
+    past_node.next = first_node
+    first_node.prev = past_node
 
 step = 1 # 1단계부터 시작
 
+be_robot_idx = 0 # 컨베이어 위에 있는 로봇 시작 인덱스
+robot_lst = [] # 로봇이 들어 있는 노드만 저장하여 따로 관리
+
 while True:
+
     # 1. 벨트가 각 칸 위에 있는 로봇과 함께 한 칸 회전한다.
-    tmp_up = up_arr[-1]
-    tmp_up_r = up_robot[-1]
-    for i in range(N-1, 0, -1):
-        up_arr[i] = up_arr[i-1]
-        up_robot[i] = up_robot[i-1]
-
-    up_robot[0] = False    # 검증 때 구현
-    up_arr[0] = down_arr[0]
-
-    # -- up_arr 정리 완료
-    for i in range(N-1):
-        down_arr[i] = down_arr[i+1]
-    down_arr[N-1] = tmp_up
-    # -- down_arr 정리 완료
+    # --> 한 칸 뒤로 pointer 이동
+    first_node = first_node.prev
+    last_node = last_node.prev
 
     # 언제든지 로봇이 내리는 위치에 도달하면 그 즉시 내린다.
-    if up_robot[-1] == True:
-        up_robot[-1] = False
+    if last_node.robot == True:
+        last_node.robot = False
+        be_robot_idx += 1
 
     # 2. 가장 먼저 벨트에 올라간 로봇부터, 벨트가 회전하는 방향으로
-    for i in range(N-2, -1, -1):
-        if up_robot[i] == True:
-            # 로봇이 이동하기 위해서는 이동하려는 칸에 로봇이 없으며,
-            if up_robot[i+1] == True: continue
-            # 그 칸의 내구도가 1 이상 남아 있어야 한다.
-            if up_arr[i+1] == 0: continue
-            # 한 칸 이동할 수 있다면 이동한다.
-            up_arr[i+1] -= 1
-            up_robot[i+1] = True
-            up_robot[i] = False
-            # 만약 이동할 수 없다면 가만히 있는다.
+    for i in range(be_robot_idx, len(robot_lst)): # 가장 먼저 벨트에 올라간 로봇부터
+        # 로봇이 이동하기 위해서는 이동하려는 칸에 로봇이 없으며
+        current_bot = robot_lst[i]
+        next_bot = current_bot.next
+
+        # 로봇이 이동하기 위해서는 이동하려는 칸에 로봇이 없으며,
+        if next_bot.robot == True: continue
+        #  그 칸의 내구도가 1 이상 남아 있어야 한다.
+        if next_bot.durable <= 0: continue
+
+        # 한 칸 이동할 수 있다면 이동한다.
+        current_bot.robot = False
+        next_bot.durable -= 1
+        if next_bot.durable == 0:
+            K -= 1
+            next_bot.durable -= 1
+
+        if current_bot.next == last_node: # 언제든지 로봇이 내리는 위치에 도달하면 그 즉시 내린다.
+            be_robot_idx += 1
+        else:
+            next_bot.robot = True
+            robot_lst[i] = next_bot
+
 
     # 3. 올리는 위치에 있는 칸의 내구도가 0이 아니면
     # 올리는 위치에 로봇을 올린다.
-    if up_arr[0] != 0:
+    if first_node.durable > 0:
         # 로봇을 올리는 위치에 올리거나 로봇이 어떤 칸으로 이동하면
         # 그 칸의 내구도는 즉시 1만큼 감소한다.
-        up_arr[0] -= 1
-        up_robot[0] = True
+        first_node.robot = True
+        first_node.durable -= 1
+        robot_lst.append(first_node)
 
-    # 내구도가 0인 칸의 개수가 K개 이상이라면 과정을 종료한다.
-    # 그렇지 않다면 1번으로 돌아간다.
-    k_cnt = 0
-    for i in range(N):
-        if up_arr[i] == 0:
-            k_cnt += 1
-        if down_arr[i] == 0:
-            k_cnt += 1
+        if first_node.durable == 0:
+            K -= 1
+            first_node.durable -= 1
 
-    if k_cnt >= K:
+    tmp = first_node
+    if K <= 0:
         break
 
     step += 1
