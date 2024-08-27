@@ -1,71 +1,51 @@
-# @ 검증
+def oob(r, c):
+    return 0 > r or r >= N or 0 > c or c >= M
 
 
-dice = dict()
-dice['u'] = 0
-dice['d'] = 0
-dice['f'] = 0
-dice['b'] = 0
-dice['l'] = 0
-dice['r'] = 0
+def change_dice(s1, s2, s3, s4, s):
+    if not s % 2:
+        dice_dict[s1], dice_dict[s2], dice_dict[s3], dice_dict[s4] = \
+            dice_dict[s4], dice_dict[s3], dice_dict[s1], dice_dict[s2]
+    else:
+        dice_dict[s4], dice_dict[s3], dice_dict[s1], dice_dict[s2] = \
+            dice_dict[s1], dice_dict[s2], dice_dict[s3], dice_dict[s4]
 
 
-def roll(d):
-    tmp = dice['u']
-    if d == 1: # 동
-        dice['u'] = dice['l']
-        dice['l'] = dice['d']
-        dice['d'] = dice['r']
-        dice['r'] = tmp
-
-    elif d == 2: # 서
-        dice['u'] = dice['r']
-        dice['r'] = dice['d']
-        dice['d'] = dice['l']
-        dice['l'] = tmp
-
-    elif d == 3: # 북
-        dice['u'] = dice['f']
-        dice['f'] = dice['d']
-        dice['d'] = dice['b']
-        dice['b'] = tmp
-
-    elif d == 4: # 남
-        dice['u'] = dice['b']
-        dice['b'] = dice['d']
-        dice['d'] = dice['f']
-        dice['f'] = tmp
-
-    return
-
-N, M, sx, sy, K = map(int, input().split())
-
-dx = [0, 0, 0, -1, 1] # 동 서 북 남
-dy = [0, 1, -1, 0, 0]
-
-x = sx
-y = sy
-
-arr = [list(map(int, input().split())) for _ in range(N)]
-
-howTo = list(map(int, input().split()))
+def spin_dice(s):
+    if s < 2:  # 동서
+        change_dice('d', 'u', 'l', 'r', s)
+    else:  # 북남
+        change_dice('d', 'u', 'b', 'f', s)
 
 
-for d in howTo:
-    nx = x + dx[d]
-    ny = y + dy[d]
-    # 정육면체는 격자판 밖으로 이동할 수 없습니다.
-    # 만약 바깥으로 이동시키려고 하는 시도가 있을 때, 해당 시도를 무시하며 출력도 하지 않습니다.
-    if 0 > nx or 0 > ny or N <= nx or M <= ny: continue
-    x = nx
-    y = ny
-    # 주사위 굴린다
-    roll(d)
+def simulate():
+    r, c = x, y
 
-    if arr[x][y] == 0:
-        arr[x][y] = dice['d']
-    elif arr[x][y] != 0:
-        dice['d'] = arr[x][y]
-        arr[x][y] = 0
+    for spin in move:
+        # 굴릴 좌표의 바닥 위치
+        row, col = r + DIR[spin][0], c + DIR[spin][1]
+        if oob(row, col): continue
+        spin_dice(spin)
+        if not MAP[row][col]:
+            # 지도가 0일 경우
+            MAP[row][col] = dice_dict['d']
+        else:
+            # 지도가 0이 아닐 경우
+            dice_dict['d'] = MAP[row][col]
+            MAP[row][col] = 0
+        print(dice_dict['u'])
 
-    print(dice['u'])
+        r, c = row, col
+
+
+N, M, x, y, k = map(int, input().split())
+
+MAP = [list(map(int, input().split())) for _ in range(N)]
+
+dice_dict = {noodle: 0 for noodle in 'udfblr'}
+
+move = list(map(lambda x: int(x) - 1, input().split()))
+
+DIR = [(0, 1), (0, -1), (-1, 0), (1, 0)]  # 동서북남
+
+simulate()
