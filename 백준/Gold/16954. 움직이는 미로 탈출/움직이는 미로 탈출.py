@@ -47,14 +47,12 @@ def move_wall():
 
 def move_character():
     global q
+    tmp_q = list()
 
-    curSize = q.__len__()
-
-    for c in range(curSize):
-        target = q.popleft()
+    for target in q:
         if arr[target[0]][target[1]] == '#': continue
 
-        q.append(target)
+        tmp_q.append(target)
 
         for i in range(8):
             nx = target[0] + dx[i]
@@ -64,8 +62,9 @@ def move_character():
             if arr[nx][ny] == '#': continue
             if visit[nx][ny] == True: continue
             visit[nx][ny] = True
-            q.append((nx, ny))
+            tmp_q.append((nx, ny))
 
+    q = tmp_q[:]
     return False
 
 dx = [-1, -1, 0, 1, 1, 1, 0, -1]
@@ -77,7 +76,7 @@ arr = [list(input()) for _ in range(N)]
 
 flag = False
 
-q = deque()
+q = list()
 
 q.append((7, 0)) # (7, 0) 시작
 
